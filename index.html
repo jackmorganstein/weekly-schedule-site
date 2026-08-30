@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weekly Schedule Planner</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="title-wrap">
+          <p class="eyebrow">Planner</p>
+          <h1>Weekly Schedule</h1>
+        </div>
+        <button id="resetButton" class="secondary-button" type="button">Reset week</button>
+      </header>
+
+      <nav class="primary-nav" aria-label="Main navigation">
+        <button class="nav-button active" data-view="today" type="button">Today</button>
+        <button class="nav-button" data-view="add" type="button">Add task</button>
+        <button class="nav-button" data-view="week" type="button">Week overview</button>
+      </nav>
+
+      <main class="views">
+        <section id="todayView" class="view-panel active panel">
+          <div class="status-card">
+            <div>
+              <p class="eyebrow">Right now</p>
+              <h2 id="currentTaskTitle">Loading…</h2>
+            </div>
+            <div class="status-meta">
+              <span id="currentDayLabel">Today</span>
+              <span id="currentTimeLabel">--:--</span>
+            </div>
+          </div>
+
+          <div id="currentTaskDetails" class="task-details">
+            Checking your schedule...
+          </div>
+
+          <div class="day-section-header">
+            <h3 id="todayHeading">Today's activities</h3>
+          </div>
+          <div id="todayTasks" class="day-task-list"></div>
+        </section>
+
+        <section id="addView" class="view-panel panel hidden">
+          <div class="form-panel">
+            <h2>Add a task</h2>
+            <form id="scheduleForm">
+              <label>
+                Day
+                <select id="day" required>
+                  <option value="Sunday">Sunday</option>
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                  <option value="Saturday">Saturday</option>
+                </select>
+              </label>
+
+              <label>
+                Title
+                <input id="title" type="text" placeholder="e.g. Design review" required />
+              </label>
+
+              <div class="time-row">
+                <label>
+                  Start
+                  <input id="start" type="time" required />
+                </label>
+                <label>
+                  End
+                  <input id="end" type="time" required />
+                </label>
+              </div>
+
+              <label>
+                Notes
+                <textarea id="notes" rows="3" placeholder="Optional details"></textarea>
+              </label>
+
+              <button class="primary-button" type="submit">Add to schedule</button>
+            </form>
+          </div>
+        </section>
+
+        <section id="weekView" class="view-panel panel hidden">
+          <div class="view-header">
+            <h2>Week overview</h2>
+          </div>
+          <div class="day-picker-row">
+            <label class="day-picker-label">
+              Select day
+              <select id="weekDaySelector" aria-label="Select a day for the overview">
+                <option value="Sunday">Sunday</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+              </select>
+            </label>
+          </div>
+          <div class="week-grid" id="weekGrid"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
