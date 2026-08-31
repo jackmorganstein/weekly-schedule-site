@@ -25,6 +25,16 @@ const defaultSchedule = Object.fromEntries(
   DAYS.map((dayName) => [dayName, dailyTemplate.map((task) => ({ ...task, notes: "" }))])
 );
 
+async function hashString(value) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(value);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 const form = document.getElementById("scheduleForm");
 const weekGrid = document.getElementById("weekGrid");
 const weekDaySelector = document.getElementById("weekDaySelector");
@@ -37,10 +47,6 @@ const todayTasks = document.getElementById("todayTasks");
 const todayHeading = document.getElementById("todayHeading");
 const navButtons = document.querySelectorAll(".nav-button");
 const viewPanels = document.querySelectorAll(".view-panel");
-
-if (localStorage.getItem("weeklyScheduleLoggedIn") !== "true") {
-  window.location.href = "login.html";
-}
 
 let schedule = loadSchedule();
 let activeView = "today";
@@ -491,13 +497,32 @@ resetButton.addEventListener("click", () => {
   setActiveView("today");
 });
 
-renderTodayTasks();
-renderWeek();
-renderCurrentStatus();
-setActiveView("today");
+async function initializeApp() {
+  const validUsernameHash = await hashString("jackmorganstein");
+  const validPasswordHash = await hashString("Charlie");
+  const storedUsernameHash = localStorage.getItem("weeklyScheduleUsernameHash");
+  const storedPasswordHash = localStorage.getItem("weeklySchedulePasswordHash");
 
-setInterval(() => {
+  if (
+    localStorage.getItem("weeklyScheduleLoggedIn") !== "true" ||
+    storedUsernameHash !== validUsernameHash ||
+    storedPasswordHash !== validPasswordHash
+  ) {
+    localStorage.removeItem("weeklyScheduleLoggedIn");
+    window.location.href = "login.html";
+    return;
+  }
+
   renderTodayTasks();
   renderWeek();
   renderCurrentStatus();
-}, 30000);
+  setActiveView("today");
+
+  setInterval(() => {
+    renderTodayTasks();
+    renderWeek();
+    renderCurrentStatus();
+  }, 30000);
+}
+
+initializeApp();

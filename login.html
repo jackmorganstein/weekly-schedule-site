@@ -101,34 +101,61 @@
     </div>
 
     <script>
-      const validUsername = "Jack Morganstein";
-      const validPassword = "Charlie";
+      async function hashString(value) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(value);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
 
-      const loginForm = document.getElementById("loginForm");
-      const usernameInput = document.getElementById("username");
-      const passwordInput = document.getElementById("password");
-      const loginError = document.getElementById("loginError");
-
-      loginForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
-
-        if (username === validUsername && password === validPassword) {
-          localStorage.setItem("weeklyScheduleLoggedIn", "true");
-          window.location.href = "index.html";
-          return;
-        }
-
-        loginError.textContent = "Incorrect username or password.";
-        usernameInput.value = "";
-        passwordInput.value = "";
-      });
-
-      if (localStorage.getItem("weeklyScheduleLoggedIn") === "true") {
-        window.location.href = "index.html";
+        return Array.from(new Uint8Array(hashBuffer))
+          .map((byte) => byte.toString(16).padStart(2, "0"))
+          .join("");
       }
+
+      async function initializeLogin() {
+        const validUsername = "jackmorganstein";
+        const validPassword = "Charlie";
+        const validUsernameHash = await hashString(validUsername);
+        const validPasswordHash = await hashString(validPassword);
+
+        const loginForm = document.getElementById("loginForm");
+        const usernameInput = document.getElementById("username");
+        const passwordInput = document.getElementById("password");
+        const loginError = document.getElementById("loginError");
+
+        loginForm.addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const username = usernameInput.value.trim();
+          const password = passwordInput.value.trim();
+          const usernameHash = await hashString(username);
+          const passwordHash = await hashString(password);
+
+          if (usernameHash === validUsernameHash && passwordHash === validPasswordHash) {
+            localStorage.setItem("weeklyScheduleLoggedIn", "true");
+            localStorage.setItem("weeklyScheduleUsernameHash", usernameHash);
+            localStorage.setItem("weeklySchedulePasswordHash", passwordHash);
+            window.location.href = "index.html";
+            return;
+          }
+
+          loginError.textContent = "Incorrect username or password.";
+          usernameInput.value = "";
+          passwordInput.value = "";
+        });
+
+        if (localStorage.getItem("weeklyScheduleLoggedIn") === "true") {
+          const storedUsernameHash = localStorage.getItem("weeklyScheduleUsernameHash");
+          const storedPasswordHash = localStorage.getItem("weeklySchedulePasswordHash");
+
+          if (storedUsernameHash === validUsernameHash && storedPasswordHash === validPasswordHash) {
+            window.location.href = "index.html";
+          } else {
+            localStorage.removeItem("weeklyScheduleLoggedIn");
+          }
+        }
+      }
+
+      initializeLogin();
     </script>
   </body>
 </html>
